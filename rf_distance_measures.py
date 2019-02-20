@@ -29,27 +29,32 @@ def forest_class_distance(clf, ex, wish_class, X_train, y_train, classified_as_w
     for col in range(cols - 1):      # trees
         for row in range(rows - 1):  # example id:s
             if leaf_id_mat[row, col] == leaf_ex_arr[0, col]:
-                print("found match at: ", row) 
+                #print("found match at: ", row) 
                 cnt[row] += 1
     sorted_cnt = cnt.most_common()
     # filter result on wish_class
     sub_X = np.empty((0, np.size(X_train, 1)))  # define X matrix 
     sub_y = np.empty((0, 1))                    # define y array
+    sub_cnt = np.empty((0,1))                   # define cnt array
     for ex, freq in sorted_cnt:
-        correct_class = y_train[ex] == wish_class
+        print("(Ex, freq): ", ex, freq)
+        correct_class = (y_train[ex] == wish_class)
+        print("correct_class: ", correct_class)
+        print("classified_as_wish: ", classified_as_wish)
         if correct_class and classified_as_wish:
             t_pred_c = clf.predict([X_train[ex]])
+            print("t_pred_c: ", t_pred_c)
             if t_pred_c[0] == wish_class:
                 print("Found example of actual wished class which is classified as such with freq: ", freq)
                 sub_X = np.vstack([sub_X, X_train[ex]]) 
-                sub_y = np.vstack([sub_y, y_train[ex]])   
-                #add sorted cnt here
+                sub_y = np.vstack([sub_y, y_train[ex]])  
+                sub_cnt = np.vstack([sub_cnt, freq]) 
         elif correct_class:
-                print("Found example of actual wished class with freq:", freq)
-                sub_X = np.vstack([sub_X, X_train[ex]]) 
-                sub_y = np.vstack([sub_y, y_train[ex]])
-                #add sorted cnt here
-    return sorted_cnt, sub_X, sub_y
+            print("Found example of actual wished class with freq:", freq)
+            sub_X = np.vstack([sub_X, X_train[ex]]) 
+            sub_y = np.vstack([sub_y, y_train[ex]])
+            sub_cnt = np.vstack([sub_cnt, freq])        
+    return sub_cnt, sub_X, sub_y
 
 ####
 # Method that returns a matrix of the normalised euclidian distance for given exeample (ex) 

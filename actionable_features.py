@@ -8,9 +8,9 @@ Code for testing different distance measures using actionable features
 """
 #import scipy
 import pandas as pd
-#import numpy as np
+import numpy as np
 #import matplotlib.pyplot as plt
-import sklearn as sk
+#import sklearn as sk
 from sklearn import model_selection
 from sklearn.ensemble import RandomForestClassifier
 #from sklearn.linear_model import LogisticRegression
@@ -35,8 +35,7 @@ y = val[:,4]
 #data preparation
 test_size = 0.20
 seed = 42
-X_train, X_test, y_train, y_test = sk.model_selection.train_test_split(X, y, test_size=test_size, random_state=seed)
-
+X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y, test_size=test_size, random_state=seed)
 
 #build RF
 forest_size = 10
@@ -47,7 +46,7 @@ clf.score(X_test, y_test)
 ex = [[3,5,4,2]] #classified as irisversicolor
 wish_class = "irisvirginica" 
 
-freq_cnt, sim_X, sim_y = forest_class_distance(clf, ex, wish_class, X_train, y_train, True)
+sim_cnt, sim_X, sim_y = forest_class_distance(clf, ex, wish_class, X_train, y_train)
 
     
 
