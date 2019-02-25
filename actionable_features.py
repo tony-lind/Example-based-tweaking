@@ -10,15 +10,17 @@ Code for testing different distance measures using actionable features
 #
 import numpy as np
 import pandas as pd
-import matplotlib
+#import matplotlib
 #from numpy import genfromtxt
 #import matplotlib.pyplot as plt
 #import sklearn as sk
-from sklearn import datasets
+#from sklearn import datasets
 from sklearn import model_selection
 from sklearn.ensemble import RandomForestClassifier
 from rf_distance_measures import forest_class_distance
- 
+from featureTweakPy import feature_tweaking
+from cost import cost_func 
+
 ## Datasets
 # ida2016 
 # dataset = pd.read_csv("data/ida_2016_challenge_update/ida_2016_training_set_update.csv")
@@ -42,18 +44,38 @@ X_iris_train, X_iris_test, y_iris_train, y_iris_test = model_selection.train_tes
 forest_size = 10
 clf = RandomForestClassifier(n_estimators=forest_size, criterion="entropy")
 clf = clf.fit(X_iris_train, y_iris_train)
-#clf.score(X_test, y_test)
+#clf.score(X_test, y_test) 
 
-ex = [[3,5,4,2]] #classified as irisversicolor
-wish_class = "irisvirginica" 
+missed = 0
+tot_rf_cost = 0
+tot_ft_cost = 0
+# Parameters for feature tweaking
+epsilon = 0.1
+y_labels = [0, 1, 2]
 
-#sim_cnt, sim_X, sim_y = forest_class_distance(clf, ex, wish_class, X_train, y_train)
-
+x = X_iris_test[0]
+y = y_iris_test[0]
+wish_class = 0
+sim_cnt, sim_X, sim_y = forest_class_distance(clf, [x], wish_class, X_iris_train, y_iris_train)
+x_new = feature_tweaking(clf, x, y_labels, wish_class, epsilon, cost_func)
+"""
+for i in range(len(X_test)):
+    x = X_test[i]
+    y = y_test[i]    
+    wish_class = random.randint(0, len(y_labels)-1)
+# RF tweaking    
+    sim_cnt, sim_X, sim_y = forest_class_distance(clf, [x], wish_class, X_train, y_train)
+    if len(sim_X) > 0:
+        val_1 = cost_func(sim_X[0], x)
+        tot_rf_cost = tot_rf_cost + val_1
+    else:
+        missed += 1    
+# FT 
+    x_new = feature_tweaking(clf, x, y_labels, wish_class, epsilon, cost_func)
+    val_2 = cost_func(x_new, x)
+    tot_ft_cost = tot_ft_cost + val_2
+"""
     
-
-
-#LIME kernel
-#Euclidian distance
 
 
 
