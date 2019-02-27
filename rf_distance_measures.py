@@ -17,7 +17,7 @@ import numpy as np
 # and is of class whish_class. 
 # If classified_as_wish is False (default) is sufficent that the example 
 # is of wish_class otherwise it must also be classified as such
-def forest_class_distance(clf, ex, wish_class, X_train, y_train, classified_as_wish=False):
+def random_forest_tweaking(clf, ex, wish_class, X_train, y_train, classified_as_wish=False):
     # calculate leaf_id_matrix
     leaf_id_mat = clf.apply(X_train)
     # shape of mat
@@ -37,32 +37,21 @@ def forest_class_distance(clf, ex, wish_class, X_train, y_train, classified_as_w
     sub_y = np.empty((0, 1))                    # define y array
     sub_cnt = np.empty((0,1))                   # define cnt array
     for ex, freq in sorted_cnt:
-        print("(Ex, freq): ", ex, freq)
+        #print("(Ex, freq): ", ex, freq)
         correct_class = (y_train[ex] == wish_class)
-        print("correct_class: ", correct_class)
-        print("classified_as_wish: ", classified_as_wish)
+        #print("correct_class: ", correct_class)
+        #print("classified_as_wish: ", classified_as_wish)
         if correct_class and classified_as_wish:
             t_pred_c = clf.predict([X_train[ex]])
-            print("t_pred_c: ", t_pred_c)
+            #print("t_pred_c: ", t_pred_c)
             if t_pred_c[0] == wish_class:
-                print("Found example of actual wished class which is classified as such with freq: ", freq)
+                #print("Found example of actual wished class which is classified as such with freq: ", freq)
                 sub_X = np.vstack([sub_X, X_train[ex]]) 
                 sub_y = np.vstack([sub_y, y_train[ex]])  
                 sub_cnt = np.vstack([sub_cnt, freq]) 
         elif correct_class:
-            print("Found example of actual wished class with freq:", freq)
+            #print("Found example of actual wished class with freq:", freq)
             sub_X = np.vstack([sub_X, X_train[ex]]) 
             sub_y = np.vstack([sub_y, y_train[ex]])
             sub_cnt = np.vstack([sub_cnt, freq])        
     return sub_cnt, sub_X, sub_y
-
-####
-# Method that returns a matrix of the normalised euclidian distance for given exeample (ex) 
-# other (training) examples and example_id. 
-# For which the following conditions holds true:
-# if an feature is numeric then the normalised euclidian distance is used 
-# if it is categorical the distance is 0 if same value 1 otherwise.
-# If classified_as_wish is False (default) is sufficent that the example 
-# is of wish_class otherwise it must also be classified as such
-#def euclidian_distance(clf, ex, wish_class, X_train, y_train, classified_as_wish=False):
-    

@@ -32,13 +32,20 @@ def search_path(estimator, class_labels, aim_label):
         while (parent_node != 0):
             if (np.where(children_left == child_node)[0].shape == (0, )):
                 parent_left = -1
-                parent_right = np.where(
-                    children_right == child_node)[0][0]
-                parent_node = parent_right
+                some_right_true = children_right == child_node           # used to crash here
+                if True in some_right_true:                       
+                    parent_right = np.where(some_right_true)[0][0]
+                    parent_node = parent_right
+                else:
+                    return {}                                            # if no true instances found  
             elif (np.where(children_right == child_node)[0].shape == (0, )):
                 parent_right = -1
-                parent_left = np.where(children_left == child_node)[0][0]
-                parent_node = parent_left
+                some_left_true = children_left == child_node
+                if True in some_left_true:
+                    parent_left = np.where(some_left_true)[0][0]
+                    parent_node = parent_left
+                else:
+                    return {}     
             parents_left.append(parent_left)
             parents_right.append(parent_right)
             """ for next step """
