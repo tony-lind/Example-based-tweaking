@@ -23,8 +23,9 @@ from rf_distance_measures import random_forest_tweaking
 from featureTweakPy import feature_tweaking
 from cost import cost_func, neighbour_tweaking
 
-datasets = [("iris", "d:/programmering/Python/actionable-features/data/iris.csv", "yes"),
-            ("glass", "d:/programmering/Python/actionable-features/data/glass.csv","yes") #,
+datasets = [#("iris", "d:/programmering/Python/actionable-features/data/iris.csv", "yes"),
+            #("glass", "d:/programmering/Python/actionable-features/data/glass.csv","yes") #,
+            ("arrhythmia", "d:/programmering/Python/actionable-features/data/arrhythmia_replaced_Nan_w_0.csv","yes")
             #("magic4", "C:/jobb/programmering/PythonDev/actionable-features/data/magic04.csv","yes")
             ]
 
