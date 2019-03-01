@@ -21,10 +21,10 @@ from sklearn import model_selection
 from sklearn.ensemble import RandomForestClassifier
 from rf_distance_measures import random_forest_tweaking
 from featureTweakPy import feature_tweaking
-from cost import cost_func 
+from cost import cost_func, neighbour_tweaking
 
-datasets = [("iris", "C:/jobb/programmering/PythonDev/actionable-features/data/iris.csv", "yes"),
-            ("glass", "C:/jobb/programmering/PythonDev/actionable-features/data/glass.csv","yes") #,
+datasets = [("iris", "d:/programmering/Python/actionable-features/data/iris.csv", "yes"),
+            ("glass", "d:/programmering/Python/actionable-features/data/glass.csv","yes") #,
             #("magic4", "C:/jobb/programmering/PythonDev/actionable-features/data/magic04.csv","yes")
             ]
 
@@ -54,16 +54,16 @@ for (d_name, d_s, trans) in datasets:
 
 # Build RF - Vary the forest size? [10, 50, 100, 250]
     our_models = []
-    clf_10 = RandomForestClassifier(n_estimators=forest_size[0], criterion="entropy")
+    clf_10 = RandomForestClassifier(n_estimators=forest_size[0], criterion="entropy", n_jobs=-1)
     clf_10 = clf_10.fit(X_train, y_train)
     our_models.append(("10", clf_10))
-    clf_50 = RandomForestClassifier(n_estimators=forest_size[1], criterion="entropy")
+    clf_50 = RandomForestClassifier(n_estimators=forest_size[1], criterion="entropy", n_jobs=-1)
     clf_50 = clf_50.fit(X_train, y_train)
     our_models.append(("50", clf_50))
-    clf_100 = RandomForestClassifier(n_estimators=forest_size[2], criterion="entropy")
+    clf_100 = RandomForestClassifier(n_estimators=forest_size[2], criterion="entropy", n_jobs=-1)
     clf_100 = clf_100.fit(X_train, y_train)
     our_models.append(("100", clf_100))
-    clf_250 = RandomForestClassifier(n_estimators=forest_size[3], criterion="entropy")
+    clf_250 = RandomForestClassifier(n_estimators=forest_size[3], criterion="entropy", n_jobs=-1)
     clf_250 = clf_250.fit(X_train, y_train)
     our_models.append(("250", clf_250))
     
@@ -84,6 +84,8 @@ for (d_name, d_s, trans) in datasets:
         # Reset performance metric values  
         missed_rft = 0
         rft_cost = 0
+        missed_nt = 0
+        tot_nt_cost = 0
         missed_ft = 0
         tot_ft_cost = 0
             
@@ -100,7 +102,7 @@ for (d_name, d_s, trans) in datasets:
             #print("y: ", y)
             #print("wish_class: ", wish_class)   
         
-            # RF tweaking            
+            # Random forest tweaking            
             sim_cnt, sim_X, sim_y = random_forest_tweaking(our_model, [x], wish_class, X_train, y_train)
             if len(sim_X) > 0:
                 val_1 = cost_func(sim_X[0], x)
@@ -108,25 +110,39 @@ for (d_name, d_s, trans) in datasets:
             else:
                 missed_rft += 1    
               
+            # Neighbour tweaking
+            ex_neighbour = neighbour_tweaking(our_model, [x], wish_class, X_train, y_train)
+            if(np.equal(ex_neighbour, x).all()):
+                missed_nt += 1
+            else:
+                val_2 = cost_func(ex_neighbour, x)
+                tot_nt_cost = tot_nt_cost + val_2
+                 
             # Feature tweaking 
             x_new_ft = feature_tweaking(our_model, x, y_labels, wish_class, epsilon, cost_func)
             if(np.equal(x_new_ft, x).all()):
                 missed_ft += 1
             else:
-                val_2 = cost_func(x_new_ft, x)
-                tot_ft_cost = tot_ft_cost + val_2    
-            
-        results.append(("random_forest_tweaking", m_size, d_name, missed_rft, val_1))   
-        results.append(("feature_tweaking", m_size, d_name, missed_ft, val_2))   
+                val_3 = cost_func(x_new_ft, x)
+                tot_ft_cost = tot_ft_cost + val_3    
+        no_ex = len(X_test)    
+        norm_val_1 = val_1 / (no_ex - missed_rft)
+        norm_val_2 = val_2 / (no_ex - missed_nt)
+        norm_val_3 = val_3 / (no_ex - missed_ft)
+        results.append(("random_forest_tweaking", no_ex, m_size, d_name, missed_rft, val_1, norm_val_1))   
+        results.append(("neighbour_tweaking", no_ex, m_size, d_name, missed_nt, val_2, norm_val_2))  
+        results.append(("feature_tweaking", no_ex, m_size, d_name, missed_ft, val_3, norm_val_3))   
     
-for (method_name, m_size, data_set_name, missed_vals, distance_val) in results:
+for (method_name, no_ex, m_size, data_set_name, missed_vals, distance_val, norm_distance_val) in results:
     print("Method: ", method_name)
+    print("No examples: ", no_ex)
     print("Model size: ", m_size)
     print("Data set: ", data_set_name)
     print("Missed cases: ", missed_vals)
-    print("Distance cost: ", distance_val)
-
-with open("C:/jobb/programmering/PythonDev/actionable-features/results", 'w') as file_handler:
+    print("Total Distance cost: ", distance_val)
+    print("Normalized Distance cost: ", norm_distance_val)
+    
+with open("d:/programmering/Python/actionable-features/results", 'w') as file_handler:
     for item in results:
         file_handler.write("{}\n".format(item))
 
