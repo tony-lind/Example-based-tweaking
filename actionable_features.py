@@ -25,7 +25,16 @@ from cost import cost_func, neighbour_tweaking
 
 datasets = [#("iris", "d:/programmering/Python/actionable-features/data/iris.csv", "yes"),
             #("glass", "d:/programmering/Python/actionable-features/data/glass.csv","yes") #,
-            ("arrhythmia", "d:/programmering/Python/actionable-features/data/arrhythmia_replaced_Nan_w_0.csv","yes")
+            #("arrhythmia", "d:/programmering/Python/actionable-features/data/arrhythmia_replaced_Nan_w_0.csv","yes")
+            #("b_c_wisconsin", "d:/programmering/Python/actionable-features/data/b_c_wisconsin.csv","yes")
+            #("bupa", "d:/programmering/Python/actionable-features/data/bupa.csv","yes")
+            #("c_h_disease", "d:/programmering/Python/actionable-features/data/c_h_disease.csv","yes")
+            #("climate model_failures", "d:/programmering/Python/actionable-features/data/climate_model_failures.csv","yes")
+            #("covtype", "d:/programmering/Python/actionable-features/data/covtype.csv","yes")
+            #("default_of_credit_card_clients", "d:/programmering/Python/actionable-features/data/default_of_credit_card_clients.csv","yes")
+            #("forest_types", "d:/programmering/Python/actionable-features/data/forest_types.csv","yes") #error in feature tweaking..
+            ("haberman", "d:/programmering/Python/actionable-features/data/haberman.csv","yes") #error in feature tweaking..
+         
             #("magic4", "C:/jobb/programmering/PythonDev/actionable-features/data/magic04.csv","yes")
             ]
 
@@ -57,15 +66,19 @@ for (d_name, d_s, trans) in datasets:
     our_models = []
     clf_10 = RandomForestClassifier(n_estimators=forest_size[0], criterion="entropy", n_jobs=-1)
     clf_10 = clf_10.fit(X_train, y_train)
+    print("Build model of size 10")
     our_models.append(("10", clf_10))
     clf_50 = RandomForestClassifier(n_estimators=forest_size[1], criterion="entropy", n_jobs=-1)
     clf_50 = clf_50.fit(X_train, y_train)
+    print("Build model of size 50")
     our_models.append(("50", clf_50))
     clf_100 = RandomForestClassifier(n_estimators=forest_size[2], criterion="entropy", n_jobs=-1)
     clf_100 = clf_100.fit(X_train, y_train)
+    print("Build model of size 100")
     our_models.append(("100", clf_100))
     clf_250 = RandomForestClassifier(n_estimators=forest_size[3], criterion="entropy", n_jobs=-1)
     clf_250 = clf_250.fit(X_train, y_train)
+    print("Build model of size 250")
     our_models.append(("250", clf_250))
     
 # Parameters for feature tweaking
@@ -80,7 +93,7 @@ for (d_name, d_s, trans) in datasets:
 #sim_cnt, sim_X, sim_y = random_forest_tweaking(clf, [x], wish_class, X_iris_train, y_iris_train)
 #x_new = feature_tweaking(clf, x, y_iris_labels, wish_class, epsilon, cost_func)
 #print(x_new)
-
+    print("Starting evaluation of tweaking methods")
     for (m_size, our_model) in  our_models:       
         # Reset performance metric values  
         missed_rft = 0
@@ -89,7 +102,10 @@ for (d_name, d_s, trans) in datasets:
         tot_nt_cost = 0
         missed_ft = 0
         tot_ft_cost = 0
-            
+        val_1 = 0
+        val_2 = 0
+        val_3 = 0
+        print("evaluation of tweaking starts")    
         for i in range(len(X_test)):
             x = X_test[i]
             y = y_test[i]    
@@ -127,9 +143,18 @@ for (d_name, d_s, trans) in datasets:
                 val_3 = cost_func(x_new_ft, x)
                 tot_ft_cost = tot_ft_cost + val_3    
         no_ex = len(X_test)    
-        norm_val_1 = val_1 / (no_ex - missed_rft)
-        norm_val_2 = val_2 / (no_ex - missed_nt)
-        norm_val_3 = val_3 / (no_ex - missed_ft)
+        if (no_ex - missed_rft) != 0:
+            norm_val_1 = val_1 / (no_ex - missed_rft)
+        else:
+            norm_val_1 = 0    
+        if (no_ex - missed_nt) != 0:
+            norm_val_2 = val_2 / (no_ex - missed_nt)
+        else:
+            norm_val_2 = 0     
+        if (no_ex - missed_ft) != 0:
+            norm_val_3 = val_3 / (no_ex - missed_ft)
+        else:
+            norm_val_3 = 0    
         results.append(("random_forest_tweaking", no_ex, m_size, d_name, missed_rft, val_1, norm_val_1))   
         results.append(("neighbour_tweaking", no_ex, m_size, d_name, missed_nt, val_2, norm_val_2))  
         results.append(("feature_tweaking", no_ex, m_size, d_name, missed_ft, val_3, norm_val_3))   
