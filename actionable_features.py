@@ -33,13 +33,17 @@ datasets = [#("iris", "d:/programmering/Python/actionable-features/data/iris.csv
             #("covtype", "d:/programmering/Python/actionable-features/data/covtype.csv","yes")
             #("default_of_credit_card_clients", "d:/programmering/Python/actionable-features/data/default_of_credit_card_clients.csv","yes")
             #("forest_types", "d:/programmering/Python/actionable-features/data/forest_types.csv","yes") #error in feature tweaking..
-            ("haberman", "d:/programmering/Python/actionable-features/data/haberman.csv","yes") #error in feature tweaking..
-         
+            #("haberman", "d:/programmering/Python/actionable-features/data/haberman.csv","yes") #error in feature tweaking..
+            #("image_seg", "c:/jobb/programmering/PythonDev/actionable-features/data/image_seg.csv","yes") 
+            #("ionosphere", "c:/jobb/programmering/PythonDev/actionable-features/data/ionosphere.csv","yes")
+            #("ionosphere", "c:/jobb/programmering/PythonDev/actionable-features/data/ionosphere.csv","yes")
             #("magic4", "C:/jobb/programmering/PythonDev/actionable-features/data/magic04.csv","yes")
+            ("sensorless_drive_diagnosis", "C:/jobb/programmering/PythonDev/actionable-features/data/sensorless_drive_diagnosis.csv","yes")
+            #("shuttle", "C:/jobb/programmering/PythonDev/data/categorical_data/shuttle.csv","yes")
             ]
 
 results = []
-forest_size = [10, 50, 100, 250]
+forest_size = [100]#, 50, 100, 250]
 for (d_name, d_s, trans) in datasets:
 ## Datasets
 # ida2016 
@@ -47,11 +51,15 @@ for (d_name, d_s, trans) in datasets:
 # Iris
 #df = pd.read_csv("C:/Users/tony/CloudStation/dsv/programming/python/Pythonstart/data/iris.csv")
 #df = pd.read_csv("C:/jobb/programmering/PythonDev/actionable-features/data/iris.csv")
-#df = pd.read_csv("C:/jobb/programmering/PythonDev/actionable-features/data/glass.csv")
+#df = pd.read_csv("C:/jobb/programmering/PythonDev/data/categorical_data/shuttle.csv")
     df = pd.read_csv(d_s)
 # Turn classes into integers
     if(trans == "yes"):
         df['class-_'] = pd.factorize(df['class-_'])[0]
+        for i in range(0, len(df.columns) - 1):   #class always last column
+            t_name = df.iloc[:,i].name
+            if('categoric-' in t_name):
+                df[t_name] = pd.factorize(df[t_name])[0]     
     values = df.values
 # Split into X and y - note that class label MUST be in the LAST column
     X = values[:,0:len(df.columns) - 1] 
@@ -64,23 +72,27 @@ for (d_name, d_s, trans) in datasets:
 
 # Build RF - Vary the forest size? [10, 50, 100, 250]
     our_models = []
+    """
     clf_10 = RandomForestClassifier(n_estimators=forest_size[0], criterion="entropy", n_jobs=-1)
     clf_10 = clf_10.fit(X_train, y_train)
     print("Build model of size 10")
     our_models.append(("10", clf_10))
+    
     clf_50 = RandomForestClassifier(n_estimators=forest_size[1], criterion="entropy", n_jobs=-1)
     clf_50 = clf_50.fit(X_train, y_train)
     print("Build model of size 50")
     our_models.append(("50", clf_50))
-    clf_100 = RandomForestClassifier(n_estimators=forest_size[2], criterion="entropy", n_jobs=-1)
+    """
+    clf_100 = RandomForestClassifier(n_estimators=forest_size[0], criterion="entropy", n_jobs=-1)
     clf_100 = clf_100.fit(X_train, y_train)
     print("Build model of size 100")
     our_models.append(("100", clf_100))
+    """
     clf_250 = RandomForestClassifier(n_estimators=forest_size[3], criterion="entropy", n_jobs=-1)
     clf_250 = clf_250.fit(X_train, y_train)
     print("Build model of size 250")
     our_models.append(("250", clf_250))
-    
+    """
 # Parameters for feature tweaking
     epsilon = 0.5 # as this gives the highest coverage of 77.4 according to their paper
     y_labels = np.unique(y)
@@ -120,6 +132,7 @@ for (d_name, d_s, trans) in datasets:
             #print("wish_class: ", wish_class)   
         
             # Random forest tweaking            
+            #print("starting random forest tweaking") 
             sim_cnt, sim_X, sim_y = random_forest_tweaking(our_model, [x], wish_class, X_train, y_train)
             if len(sim_X) > 0:
                 val_1 = cost_func(sim_X[0], x)
@@ -128,6 +141,7 @@ for (d_name, d_s, trans) in datasets:
                 missed_rft += 1    
               
             # Neighbour tweaking
+            #print("starting neighbour tweaking")
             ex_neighbour = neighbour_tweaking(our_model, [x], wish_class, X_train, y_train)
             if(np.equal(ex_neighbour, x).all()):
                 missed_nt += 1
@@ -136,6 +150,7 @@ for (d_name, d_s, trans) in datasets:
                 tot_nt_cost = tot_nt_cost + val_2
                  
             # Feature tweaking 
+            #print("starting feature tweaking")
             x_new_ft = feature_tweaking(our_model, x, y_labels, wish_class, epsilon, cost_func)
             if(np.equal(x_new_ft, x).all()):
                 missed_ft += 1
@@ -168,7 +183,7 @@ for (method_name, no_ex, m_size, data_set_name, missed_vals, distance_val, norm_
     print("Total Distance cost: ", distance_val)
     print("Normalized Distance cost: ", norm_distance_val)
     
-with open("d:/programmering/Python/actionable-features/results", 'w') as file_handler:
+with open("c:/jobb/programmering/PythonDev/actionable-features/results", 'w') as file_handler:
     for item in results:
         file_handler.write("{}\n".format(item))
 
