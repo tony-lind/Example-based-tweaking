@@ -21,9 +21,9 @@ from sklearn import model_selection
 from sklearn.ensemble import RandomForestClassifier
 from rf_distance_measures import random_forest_tweaking
 from featureTweakPy import feature_tweaking
-from cost import cost_func, neighbour_tweaking
+from cost import cost_func, neighbour_tweaking, to_closest_int
 
-datasets = [#("iris", "d:/programmering/Python/actionable-features/data/iris.csv", "yes"),
+datasets = [("iris", "C:/jobb/programmering/PythonDev/data/numerical_data/iris.csv", "yes"),
             #("glass", "d:/programmering/Python/actionable-features/data/glass.csv","yes") #,
             #("arrhythmia", "d:/programmering/Python/actionable-features/data/arrhythmia_replaced_Nan_w_0.csv","yes")
             #("b_c_wisconsin", "d:/programmering/Python/actionable-features/data/b_c_wisconsin.csv","yes")
@@ -38,12 +38,24 @@ datasets = [#("iris", "d:/programmering/Python/actionable-features/data/iris.csv
             #("ionosphere", "c:/jobb/programmering/PythonDev/actionable-features/data/ionosphere.csv","yes")
             #("ionosphere", "c:/jobb/programmering/PythonDev/actionable-features/data/ionosphere.csv","yes")
             #("magic4", "C:/jobb/programmering/PythonDev/actionable-features/data/magic04.csv","yes")
-            ("sensorless_drive_diagnosis", "C:/jobb/programmering/PythonDev/actionable-features/data/sensorless_drive_diagnosis.csv","yes")
+            #("sensorless_drive_diagnosis", "C:/jobb/programmering/PythonDev/actionable-features/data/sensorless_drive_diagnosis.csv","yes")
             #("shuttle", "C:/jobb/programmering/PythonDev/data/categorical_data/shuttle.csv","yes")
+            #("connect_4", "C:/jobb/programmering/PythonDev/data/categorical_data/connect_4.csv","yes")
+            #("tictactoe", "C:/jobb/programmering/PythonDev/data/categorical_data/tictactoe.csv","yes")
+            #("zoo", "C:/jobb/programmering/PythonDev/data/categorical_data/zoo.csv","yes")
+            #("king_rook_vs_king_pawn", "C:/jobb/programmering/PythonDev/data/categorical_data/king_rook_vs_king_pawn.csv","yes")       
+            #("car", "C:/jobb/programmering/PythonDev/data/categorical_data/car.csv","yes")   
+            #("1625Data", "C:/jobb/programmering/PythonDev/data/categorical_data/hiv/1625Data.csv","yes")  
+            #("746Data", "C:/jobb/programmering/PythonDev/data/categorical_data/hiv/746Data.csv","yes")  
+            #("impens", "C:/jobb/programmering/PythonDev/data/categorical_data/hiv/impens.csv","yes") 
+            #("schilling", "C:/jobb/programmering/PythonDev/data/categorical_data/hiv/schilling.csv","yes")
+            #("nursery", "C:/jobb/programmering/PythonDev/data/categorical_data/nursery.csv","yes")  
+            #("titanic", "C:/jobb/programmering/PythonDev/data/categorical_data/titanic.csv","yes")  
+            
             ]
 
 results = []
-forest_size = [100]#, 50, 100, 250]
+forest_size = [10, 50, 100, 250]
 for (d_name, d_s, trans) in datasets:
 ## Datasets
 # ida2016 
@@ -72,7 +84,7 @@ for (d_name, d_s, trans) in datasets:
 
 # Build RF - Vary the forest size? [10, 50, 100, 250]
     our_models = []
-    """
+    
     clf_10 = RandomForestClassifier(n_estimators=forest_size[0], criterion="entropy", n_jobs=-1)
     clf_10 = clf_10.fit(X_train, y_train)
     print("Build model of size 10")
@@ -82,17 +94,17 @@ for (d_name, d_s, trans) in datasets:
     clf_50 = clf_50.fit(X_train, y_train)
     print("Build model of size 50")
     our_models.append(("50", clf_50))
-    """
-    clf_100 = RandomForestClassifier(n_estimators=forest_size[0], criterion="entropy", n_jobs=-1)
+    
+    clf_100 = RandomForestClassifier(n_estimators=forest_size[2], criterion="entropy", n_jobs=-1)
     clf_100 = clf_100.fit(X_train, y_train)
     print("Build model of size 100")
     our_models.append(("100", clf_100))
-    """
-    clf_250 = RandomForestClassifier(n_estimators=forest_size[3], criterion="entropy", n_jobs=-1)
+    
+    clf_250 = RandomForestClassifier(n_estimators=forest_size[0], criterion="entropy", n_jobs=-1)
     clf_250 = clf_250.fit(X_train, y_train)
     print("Build model of size 250")
     our_models.append(("250", clf_250))
-    """
+    
 # Parameters for feature tweaking
     epsilon = 0.5 # as this gives the highest coverage of 77.4 according to their paper
     y_labels = np.unique(y)
@@ -106,17 +118,19 @@ for (d_name, d_s, trans) in datasets:
 #x_new = feature_tweaking(clf, x, y_iris_labels, wish_class, epsilon, cost_func)
 #print(x_new)
     print("Starting evaluation of tweaking methods")
-    for (m_size, our_model) in  our_models:       
+    for (m_size, our_model) in our_models:       
         # Reset performance metric values  
         missed_rft = 0
-        rft_cost = 0
+        tot_rft_cost = 0
         missed_nt = 0
         tot_nt_cost = 0
         missed_ft = 0
         tot_ft_cost = 0
+        tot_ft_int_cost = 0
         val_1 = 0
         val_2 = 0
         val_3 = 0
+        val_4 = 0
         print("evaluation of tweaking starts")    
         for i in range(len(X_test)):
             x = X_test[i]
@@ -135,8 +149,9 @@ for (d_name, d_s, trans) in datasets:
             #print("starting random forest tweaking") 
             sim_cnt, sim_X, sim_y = random_forest_tweaking(our_model, [x], wish_class, X_train, y_train)
             if len(sim_X) > 0:
+                #print("RFT: ", sim_X[0])
                 val_1 = cost_func(sim_X[0], x)
-                rft_cost = rft_cost + val_1
+                tot_rft_cost = tot_rft_cost + val_1
             else:
                 missed_rft += 1    
               
@@ -146,6 +161,7 @@ for (d_name, d_s, trans) in datasets:
             if(np.equal(ex_neighbour, x).all()):
                 missed_nt += 1
             else:
+                #print("NT: ", ex_neighbour)
                 val_2 = cost_func(ex_neighbour, x)
                 tot_nt_cost = tot_nt_cost + val_2
                  
@@ -155,26 +171,34 @@ for (d_name, d_s, trans) in datasets:
             if(np.equal(x_new_ft, x).all()):
                 missed_ft += 1
             else:
+                #print("FT: ", x_new_ft)
+                int_x_ft = to_closest_int(x_new_ft) 
+                #print("FT: ", int_x_ft)               
                 val_3 = cost_func(x_new_ft, x)
-                tot_ft_cost = tot_ft_cost + val_3    
+                val_4 = cost_func(int_x_ft, x)
+                tot_ft_cost = tot_ft_cost + val_3
+                tot_ft_int_cost = tot_ft_int_cost + val_4
+                 
         no_ex = len(X_test)    
         if (no_ex - missed_rft) != 0:
-            norm_val_1 = val_1 / (no_ex - missed_rft)
+            norm_val_1 = tot_rft_cost / (no_ex - missed_rft)
         else:
             norm_val_1 = 0    
         if (no_ex - missed_nt) != 0:
-            norm_val_2 = val_2 / (no_ex - missed_nt)
+            norm_val_2 = tot_nt_cost / (no_ex - missed_nt)
         else:
             norm_val_2 = 0     
         if (no_ex - missed_ft) != 0:
-            norm_val_3 = val_3 / (no_ex - missed_ft)
+            norm_val_3 = tot_ft_cost / (no_ex - missed_ft)
+            norm_val_4 = tot_ft_int_cost / (no_ex - missed_ft)
         else:
             norm_val_3 = 0    
-        results.append(("random_forest_tweaking", no_ex, m_size, d_name, missed_rft, val_1, norm_val_1))   
-        results.append(("neighbour_tweaking", no_ex, m_size, d_name, missed_nt, val_2, norm_val_2))  
-        results.append(("feature_tweaking", no_ex, m_size, d_name, missed_ft, val_3, norm_val_3))   
+            norm_val_4 = 0
+        results.append(("random_forest_tweaking", no_ex, m_size, d_name, missed_rft, tot_rft_cost, norm_val_1, 0, 0))   
+        results.append(("neighbour_tweaking", no_ex, m_size, d_name, missed_nt, tot_nt_cost, norm_val_2, 0, 0))  
+        results.append(("feature_tweaking", no_ex, m_size, d_name, missed_ft, tot_ft_cost, norm_val_3, tot_ft_int_cost, norm_val_4))   
     
-for (method_name, no_ex, m_size, data_set_name, missed_vals, distance_val, norm_distance_val) in results:
+for (method_name, no_ex, m_size, data_set_name, missed_vals, distance_val, norm_distance_val, int_d_val, norm_d_int_val) in results:
     print("Method: ", method_name)
     print("No examples: ", no_ex)
     print("Model size: ", m_size)
@@ -182,6 +206,8 @@ for (method_name, no_ex, m_size, data_set_name, missed_vals, distance_val, norm_
     print("Missed cases: ", missed_vals)
     print("Total Distance cost: ", distance_val)
     print("Normalized Distance cost: ", norm_distance_val)
+    print("Total Inteteger Distance cost: ", int_d_val)
+    print("Normalized Integer Distance cost: ", norm_d_int_val)
     
 with open("c:/jobb/programmering/PythonDev/actionable-features/results", 'w') as file_handler:
     for item in results:

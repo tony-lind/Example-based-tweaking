@@ -10,6 +10,12 @@ import numpy as np
 def cost_func(a, b):
     return np.linalg.norm(a - b)
 
+def to_closest_int(vec):
+    for i in range(len(vec) - 1):
+        if not np.equal(np.mod(vec[i], 1), 0):
+            vec[i] = round(vec[i])
+    return vec
+
 
 def neighbour_tweaking(clf, ex, wish_class, X_train, y_train, classified_as_wish=False):
     temp_best_cost = 100000

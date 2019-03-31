@@ -18,7 +18,10 @@ def search_path(estimator, class_labels, aim_label):
     # leaf nodes ID
     leaf_nodes = np.where(children_left == -1)[0]
     # outcomes of leaf nodes
-    leaf_values = estimator.tree_.value[leaf_nodes].reshape(len(leaf_nodes), len(class_labels))
+    try:
+        leaf_values = estimator.tree_.value[leaf_nodes].reshape(len(leaf_nodes), len(class_labels))
+    except:
+        return {}
     # select the leaf nodes whose outcome is aim_label
     leaf_nodes = np.where(leaf_values[:, aim_label] != 0)[0]
     """ search the path to the selected leaf node """
@@ -58,7 +61,7 @@ def search_path(estimator, class_labels, aim_label):
         node_ids = []  # node ids used in the current node
         # inequality symbols used in the current node
         inequality_symbols = []
-        thresholds = []  # thretholds used in the current node
+        thresholds = []  # thresholds used in the current node
         features = []  # features used in the current node
         parents_left, parents_right = paths[i]
         for idx in range(len(parents_left)):

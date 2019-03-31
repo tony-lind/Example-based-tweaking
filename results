@@ -1,3 +1,3 @@
-('random_forest_tweaking', 11702, '50', 'sensorless_drive_diagnosis', 7106, 47.15564950372228, 0.010260150022567947)
-('neighbour_tweaking', 11702, '50', 'sensorless_drive_diagnosis', 0, 2.0292363759850627, 0.00017340936386814755)
-('feature_tweaking', 11702, '50', 'sensorless_drive_diagnosis', 0, 1.0194700870488298, 8.711930328566312e-05)
+('random_forest_tweaking', 192, '10', 'tictactoe', 2, 387.9178517545379, 2.041672903971252, 0, 0)
+('neighbour_tweaking', 192, '10', 'tictactoe', 0, 304.8890689802011, 1.5879639009385473, 0, 0)
+('feature_tweaking', 192, '10', 'tictactoe', 77, 151.53031061458424, 1.3176548749094281, 151.53031061458424, 1.3176548749094281)
