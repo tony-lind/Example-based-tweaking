@@ -11,7 +11,7 @@ from collections import Counter
 import numpy as np
 ####
 # Method that returns an three arrays, one, containing the number of times the an
-# example cooccurs in leaf with ex, two the array of example and three the classes of the examples. 
+# example co-occurs in leaf with ex, two the array of example and three the classes of the examples. 
 # For which the following conditions holds true:
 # examples share leaf node with example in count number of leafs 
 # and is of class whish_class. 

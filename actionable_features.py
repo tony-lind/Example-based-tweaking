@@ -6,64 +6,44 @@ Code for testing different distance measures using actionable features
 
 @author: Tony Lindgren, tony@dsv.su.se
 """
-#import scipy
-#
 import numpy as np
 import pandas as pd
-#import matplotlib
 import random
-#from numpy import genfromtxt
-#import matplotlib.pyplot as plt
-#import sklearn as sk
-#from sklearn import datasets
-
 from sklearn import model_selection
 from sklearn.ensemble import RandomForestClassifier
 from rf_distance_measures import random_forest_tweaking
 from featureTweakPy import feature_tweaking
 from cost import cost_func, neighbour_tweaking, to_closest_int
 
-datasets = [("iris", "C:/jobb/programmering/PythonDev/data/numerical_data/iris.csv", "yes"),
-            #("glass", "d:/programmering/Python/actionable-features/data/glass.csv","yes") #,
-            #("arrhythmia", "d:/programmering/Python/actionable-features/data/arrhythmia_replaced_Nan_w_0.csv","yes")
-            #("b_c_wisconsin", "d:/programmering/Python/actionable-features/data/b_c_wisconsin.csv","yes")
-            #("bupa", "d:/programmering/Python/actionable-features/data/bupa.csv","yes")
-            #("c_h_disease", "d:/programmering/Python/actionable-features/data/c_h_disease.csv","yes")
-            #("climate model_failures", "d:/programmering/Python/actionable-features/data/climate_model_failures.csv","yes")
-            #("covtype", "d:/programmering/Python/actionable-features/data/covtype.csv","yes")
-            #("default_of_credit_card_clients", "d:/programmering/Python/actionable-features/data/default_of_credit_card_clients.csv","yes")
-            #("forest_types", "d:/programmering/Python/actionable-features/data/forest_types.csv","yes") #error in feature tweaking..
-            #("haberman", "d:/programmering/Python/actionable-features/data/haberman.csv","yes") #error in feature tweaking..
-            #("image_seg", "c:/jobb/programmering/PythonDev/actionable-features/data/image_seg.csv","yes") 
-            #("ionosphere", "c:/jobb/programmering/PythonDev/actionable-features/data/ionosphere.csv","yes")
-            #("ionosphere", "c:/jobb/programmering/PythonDev/actionable-features/data/ionosphere.csv","yes")
-            #("magic4", "C:/jobb/programmering/PythonDev/actionable-features/data/magic04.csv","yes")
-            #("sensorless_drive_diagnosis", "C:/jobb/programmering/PythonDev/actionable-features/data/sensorless_drive_diagnosis.csv","yes")
-            #("shuttle", "C:/jobb/programmering/PythonDev/data/categorical_data/shuttle.csv","yes")
-            #("connect_4", "C:/jobb/programmering/PythonDev/data/categorical_data/connect_4.csv","yes")
-            #("tictactoe", "C:/jobb/programmering/PythonDev/data/categorical_data/tictactoe.csv","yes")
-            #("zoo", "C:/jobb/programmering/PythonDev/data/categorical_data/zoo.csv","yes")
-            #("king_rook_vs_king_pawn", "C:/jobb/programmering/PythonDev/data/categorical_data/king_rook_vs_king_pawn.csv","yes")       
-            #("car", "C:/jobb/programmering/PythonDev/data/categorical_data/car.csv","yes")   
-            #("1625Data", "C:/jobb/programmering/PythonDev/data/categorical_data/hiv/1625Data.csv","yes")  
-            #("746Data", "C:/jobb/programmering/PythonDev/data/categorical_data/hiv/746Data.csv","yes")  
-            #("impens", "C:/jobb/programmering/PythonDev/data/categorical_data/hiv/impens.csv","yes") 
-            #("schilling", "C:/jobb/programmering/PythonDev/data/categorical_data/hiv/schilling.csv","yes")
-            #("nursery", "C:/jobb/programmering/PythonDev/data/categorical_data/nursery.csv","yes")  
-            #("titanic", "C:/jobb/programmering/PythonDev/data/categorical_data/titanic.csv","yes")  
-            
+datasets = [# Numerical data sets
+            #("b_c_wisconsin", "c:/jobb/programmering/PythonDev/actionable-features/data/numerical/b_c_wisconsin.csv","yes")
+            #("bupa", "c:/jobb/programmering/PythonDev/actionable-features/data/numerical/bupa.csv","yes")
+            #("c_h_disease", "c:/jobb/programmering/PythonDev/actionable-features/data/numerical/c_h_disease.csv","yes")
+            #("climate_model_failures", "c:/jobb/programmering/PythonDev/actionable-features/data/numerical/climate_model_failures.csv","yes")
+            #("glass", "c:/jobb/programmering/PythonDev/actionable-features/data/numerical/glass.csv","yes")
+            #("image_seg", "c:/jobb/programmering/PythonDev/actionable-features/data/numerical/image_seg.csv","yes") 
+            #("ionosphere", "c:/jobb/programmering/PythonDev/actionable-features/data/numerical/ionosphere.csv","yes")
+            #("iris", "c:/jobb/programmering/PythonDev/actionable-features/data/numerical/iris.csv", "yes")
+            #("magic04", "c:/jobb/programmering/PythonDev/actionable-features/data/numerical/magic04.csv","yes")
+            #("pendigits", "c:/jobb/programmering/PythonDev/actionable-features/data/numerical/pendigits.csv","yes")
+            #("pima_indians", "c:/jobb/programmering/PythonDev/actionable-features/data/numerical/pima_indians.csv","yes")
+            # Categorical data sets               
+            #("balance_scale", "c:/jobb/programmering/PythonDev/actionable-features/data/categorical/balance_scale.csv","yes")
+            #("car", "c:/jobb/programmering/PythonDev/actionable-features/data/categorical/car.csv","yes")
+            #("HIV_746", "c:/jobb/programmering/PythonDev/actionable-features/data/categorical/HIV_746.csv","yes")
+            #("HIV_1625", "C:/jobb/programmering/PythonDev/actionable-features/data/categorical/HIV_1625.csv","yes")
+            #("impens", "c:/jobb/programmering/PythonDev/actionable-features/data/categorical/impens.csv","yes")
+            #("KRKP7", "c:/jobb/programmering/PythonDev/actionable-features/data/categorical/KRKP7.csv","yes"),          
+            #("promoters", "c:/jobb/programmering/PythonDev/actionable-features/data/categorical/promoters.csv","yes")
+            #("schilling", "c:/jobb/programmering/PythonDev/actionable-features/data/categorical/schilling.csv","yes")  
+            ("shuttle", "c:/jobb/programmering/PythonDev/actionable-features/data/categorical/shuttle.csv","yes")
+            #("tic_tac_toe", "c:/jobb/programmering/PythonDev/actionable-features/data/categorical/tictactoe.csv","yes")                               
+            #("zoo", "C:/jobb/programmering/PythonDev/actionable-features/data/categorical/zoo.csv","yes")            
             ]
 
 results = []
 forest_size = [10, 50, 100, 250]
 for (d_name, d_s, trans) in datasets:
-## Datasets
-# ida2016 
-# dataset = pd.read_csv("data/ida_2016_challenge_update/ida_2016_training_set_update.csv")
-# Iris
-#df = pd.read_csv("C:/Users/tony/CloudStation/dsv/programming/python/Pythonstart/data/iris.csv")
-#df = pd.read_csv("C:/jobb/programmering/PythonDev/actionable-features/data/iris.csv")
-#df = pd.read_csv("C:/jobb/programmering/PythonDev/data/categorical_data/shuttle.csv")
     df = pd.read_csv(d_s)
 # Turn classes into integers
     if(trans == "yes"):
@@ -108,15 +88,6 @@ for (d_name, d_s, trans) in datasets:
 # Parameters for feature tweaking
     epsilon = 0.5 # as this gives the highest coverage of 77.4 according to their paper
     y_labels = np.unique(y)
-
-#x = X_iris_test[0]
-#print(x)
-#y = y_iris_test[0]
-#wish_class = 0
-#print(y)
-#sim_cnt, sim_X, sim_y = random_forest_tweaking(clf, [x], wish_class, X_iris_train, y_iris_train)
-#x_new = feature_tweaking(clf, x, y_iris_labels, wish_class, epsilon, cost_func)
-#print(x_new)
     print("Starting evaluation of tweaking methods")
     for (m_size, our_model) in our_models:       
         # Reset performance metric values  
@@ -126,11 +97,10 @@ for (d_name, d_s, trans) in datasets:
         tot_nt_cost = 0
         missed_ft = 0
         tot_ft_cost = 0
-        tot_ft_int_cost = 0
         val_1 = 0
         val_2 = 0
         val_3 = 0
-        val_4 = 0
+       
         print("evaluation of tweaking starts")    
         for i in range(len(X_test)):
             x = X_test[i]
@@ -172,12 +142,9 @@ for (d_name, d_s, trans) in datasets:
                 missed_ft += 1
             else:
                 #print("FT: ", x_new_ft)
-                int_x_ft = to_closest_int(x_new_ft) 
                 #print("FT: ", int_x_ft)               
-                val_3 = cost_func(x_new_ft, x)
-                val_4 = cost_func(int_x_ft, x)
-                tot_ft_cost = tot_ft_cost + val_3
-                tot_ft_int_cost = tot_ft_int_cost + val_4
+                val_3 = cost_func(x_new_ft, x)               
+                tot_ft_cost = tot_ft_cost + val_3               
                  
         no_ex = len(X_test)    
         if (no_ex - missed_rft) != 0:
@@ -189,16 +156,15 @@ for (d_name, d_s, trans) in datasets:
         else:
             norm_val_2 = 0     
         if (no_ex - missed_ft) != 0:
-            norm_val_3 = tot_ft_cost / (no_ex - missed_ft)
-            norm_val_4 = tot_ft_int_cost / (no_ex - missed_ft)
+            norm_val_3 = tot_ft_cost / (no_ex - missed_ft)           
         else:
             norm_val_3 = 0    
-            norm_val_4 = 0
-        results.append(("random_forest_tweaking", no_ex, m_size, d_name, missed_rft, tot_rft_cost, norm_val_1, 0, 0))   
-        results.append(("neighbour_tweaking", no_ex, m_size, d_name, missed_nt, tot_nt_cost, norm_val_2, 0, 0))  
-        results.append(("feature_tweaking", no_ex, m_size, d_name, missed_ft, tot_ft_cost, norm_val_3, tot_ft_int_cost, norm_val_4))   
+        
+        results.append(("random_forest_tweaking", no_ex, m_size, d_name, missed_rft, tot_rft_cost, norm_val_1))   
+        results.append(("neighbour_tweaking", no_ex, m_size, d_name, missed_nt, tot_nt_cost, norm_val_2))  
+        results.append(("feature_tweaking", no_ex, m_size, d_name, missed_ft, tot_ft_cost, norm_val_3))   
     
-for (method_name, no_ex, m_size, data_set_name, missed_vals, distance_val, norm_distance_val, int_d_val, norm_d_int_val) in results:
+for (method_name, no_ex, m_size, data_set_name, missed_vals, distance_val, norm_distance_val) in results:
     print("Method: ", method_name)
     print("No examples: ", no_ex)
     print("Model size: ", m_size)
@@ -206,8 +172,6 @@ for (method_name, no_ex, m_size, data_set_name, missed_vals, distance_val, norm_
     print("Missed cases: ", missed_vals)
     print("Total Distance cost: ", distance_val)
     print("Normalized Distance cost: ", norm_distance_val)
-    print("Total Inteteger Distance cost: ", int_d_val)
-    print("Normalized Integer Distance cost: ", norm_d_int_val)
     
 with open("c:/jobb/programmering/PythonDev/actionable-features/results", 'w') as file_handler:
     for item in results:
